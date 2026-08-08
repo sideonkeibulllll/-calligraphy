@@ -1,0 +1,35 @@
+:root {
+  --bg-base: #1a1714;
+  --bg-surface: #241f1b;
+  --bg-elevated: #2d2722;
+  --bg-input: #332b25;
+
+  --neon-pink: #ff4d9d;
+  --neon-pink-soft: rgba(255, 77, 157, 0.16);
+  --neon-teal: #2ee6c8;
+  --neon-teal-soft: rgba(46, 230, 200, 0.16);
+  --neon-yellow: #ffd93d;
+  --neon-yellow-soft: rgba(255, 217, 61, 0.16);
+
+  --text-primary: #ffffff;
+  --text-secondary: #c9c0b6;
+  --text-tertiary: #8a8278;
+
+  --border-soft: rgba(255, 255, 255, 0.08);
+  --border-pink: rgba(255, 77, 157, 0.45);
+  --border-teal: rgba(46, 230, 200, 0.45);
+  --border-yellow: rgba(255, 217, 61, 0.45);
+
+  --radius-capsule: 20px;
+  --radius-card: 16px;
+  --radius-md: 12px;
+  --radius-sm: 8px;
+
+  --shadow-pink: 4px 4px 0 var(--neon-pink);
+  --shadow-teal: 4px 4px 0 var(--neon-teal);
+  --shadow-yellow: 4px 4px 0 var(--neon-yellow);
+  --shadow-dark: 4px 4px 0 rgba(0, 0, 0, 0.6);
+
+  --tab-height: 64px;
+  --safe-bottom: env(safe-area-inset-bottom, 0px);
+}

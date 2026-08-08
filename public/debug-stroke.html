@@ -1,0 +1,310 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>笔顺字方向调试 · 你</title>
+<style>
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  body {
+    background: #1a1714;
+    color: #fff;
+    font-family: -apple-system, "PingFang SC", "Microsoft YaHei", sans-serif;
+    min-height: 100vh;
+    padding: 24px 16px 40px;
+  }
+  .wrap { max-width: 720px; margin: 0 auto; }
+  h1 {
+    font-size: 18px; font-weight: 800; text-align: center;
+    margin-bottom: 6px;
+    background: linear-gradient(90deg, #ff4d9d, #2ee6c8, #ffd93d);
+    -webkit-background-clip: text; background-clip: text;
+    -webkit-text-fill-color: transparent;
+  }
+  .sub { font-size: 12px; color: #8a847e; text-align: center; margin-bottom: 24px; line-height: 1.6; }
+
+  .compare {
+    display: flex; gap: 16px; justify-content: center; margin-bottom: 24px;
+  }
+  .panel {
+    flex: 1; max-width: 300px;
+    background: #221d19; border: 1px solid #3a322c;
+    border-radius: 16px; padding: 16px;
+  }
+  .panel-title {
+    font-size: 12px; font-weight: 700; margin-bottom: 12px;
+    display: flex; align-items: center; gap: 8px;
+  }
+  .tag {
+    font-size: 10px; padding: 2px 8px; border-radius: 20px; font-weight: 600;
+  }
+  .tag-adjust { background: rgba(255,77,157,0.15); color: #ff4d9d; border: 1px solid #ff4d9d; }
+  .tag-ref { background: rgba(46,230,200,0.15); color: #2ee6c8; border: 1px solid #2ee6c8; }
+
+  .char-box {
+    width: 100%; aspect-ratio: 1; position: relative;
+    background: #1a1714; border-radius: 12px; overflow: hidden;
+    display: flex; align-items: center; justify-content: center;
+  }
+  /* 米字格参考线 */
+  .char-box::before, .char-box::after {
+    content: ''; position: absolute; background: rgba(255,255,255,0.08);
+  }
+  .char-box::before { left: 0; right: 0; top: 50%; height: 1px; }
+  .char-box::after { top: 0; bottom: 0; left: 50%; width: 1px; }
+  .diag {
+    position: absolute; inset: 0; pointer-events: none;
+  }
+  .diag::before, .diag::after {
+    content: ''; position: absolute; top: 0; bottom: 0; left: 50%; width: 1px;
+    background: rgba(255,255,255,0.05); transform-origin: center;
+  }
+  .diag::before { transform: rotate(45deg); }
+  .diag::after { transform: rotate(-45deg); }
+
+  svg { display: block; }
+  .ref-char {
+    font-size: 220px; line-height: 1; color: #fff;
+    position: relative; z-index: 1; user-select: none;
+  }
+
+  .controls {
+    background: #221d19; border: 1px solid #3a322c;
+    border-radius: 16px; padding: 20px; margin-bottom: 20px;
+  }
+  .ctrl-row {
+    display: flex; align-items: center; gap: 12px; margin-bottom: 16px;
+    flex-wrap: wrap;
+  }
+  .ctrl-row:last-child { margin-bottom: 0; }
+  .ctrl-label {
+    font-size: 13px; font-weight: 700; min-width: 72px; color: #d8d2cc;
+  }
+  .btn {
+    padding: 6px 14px; border-radius: 20px; font-size: 12px; font-weight: 600;
+    border: 1px solid #3a322c; background: #1a1714; color: #d8d2cc;
+    cursor: pointer; transition: all 0.15s;
+  }
+  .btn:hover { border-color: #ff4d9d; color: #ff4d9d; }
+  .btn.active { background: rgba(255,77,157,0.15); border-color: #ff4d9d; color: #ff4d9d; }
+  .btn-teal:hover { border-color: #2ee6c8; color: #2ee6c8; }
+  .btn-teal.active { background: rgba(46,230,200,0.15); border-color: #2ee6c8; color: #2ee6c8; }
+  input[type=range] {
+    flex: 1; min-width: 120px; accent-color: #ffd93d;
+  }
+  .val {
+    font-size: 12px; color: #ffd93d; min-width: 36px; text-align: right;
+    font-variant-numeric: tabular-nums; font-weight: 700;
+  }
+
+  .output {
+    background: #221d19; border: 1px solid #3a322c;
+    border-radius: 16px; padding: 20px;
+  }
+  .out-label { font-size: 12px; color: #8a847e; margin-bottom: 10px; }
+  .out-box {
+    background: #1a1714; border: 1px dashed #ffd93d;
+    border-radius: 10px; padding: 14px; margin-bottom: 14px;
+    font-family: "Cascadia Code", "Consolas", monospace; font-size: 13px;
+    color: #ffd93d; word-break: break-all; min-height: 44px;
+    display: flex; align-items: center;
+  }
+  .out-box.empty { color: #8a847e; font-style: italic; }
+  .actions { display: flex; gap: 10px; }
+  .btn-primary {
+    flex: 1; padding: 12px; border-radius: 20px; font-size: 13px; font-weight: 700;
+    border: none; cursor: pointer;
+    background: #ff4d9d; color: #fff;
+    box-shadow: 3px 3px 0 #b33a6f;
+    transition: transform 0.1s;
+  }
+  .btn-primary:active { transform: translate(2px, 2px); box-shadow: 1px 1px 0 #b33a6f; }
+  .btn-ghost {
+    padding: 12px 20px; border-radius: 20px; font-size: 13px; font-weight: 700;
+    border: 1px solid #3a322c; background: transparent; color: #d8d2cc; cursor: pointer;
+  }
+  .toast {
+    position: fixed; bottom: 24px; left: 50%; transform: translateX(-50%) translateY(20px);
+    background: #2ee6c8; color: #1a1714; padding: 10px 20px; border-radius: 20px;
+    font-size: 13px; font-weight: 700; opacity: 0; transition: all 0.3s;
+    pointer-events: none;
+  }
+  .toast.show { opacity: 1; transform: translateX(-50%) translateY(0); }
+</style>
+</head>
+<body>
+<div class="wrap">
+  <h1>笔顺字方向调试台</h1>
+  <div class="sub">左边用 Make Me a Hanzi 的 SVG 笔画渲染（可调），右边是系统字体「你」做正向参考<br>调到左边和右边看起来一致后，点「复制 transform」发给天喵</div>
+
+  <div class="compare">
+    <div class="panel">
+      <div class="panel-title">SVG 笔画 <span class="tag tag-adjust">可调</span></div>
+      <div class="char-box">
+        <div class="diag"></div>
+        <svg id="svg" width="260" height="260" viewBox="0 0 1024 1024" style="position:relative;z-index:1;overflow:visible;">
+          <g id="charGroup"></g>
+        </svg>
+      </div>
+    </div>
+    <div class="panel">
+      <div class="panel-title">系统字体参考 <span class="tag tag-ref">正向</span></div>
+      <div class="char-box">
+        <div class="diag"></div>
+        <span class="ref-char">你</span>
+      </div>
+    </div>
+  </div>
+
+  <div class="controls">
+    <div class="ctrl-row">
+      <span class="ctrl-label">旋转</span>
+      <button class="btn" data-rot="0">0°</button>
+      <button class="btn" data-rot="90">90°</button>
+      <button class="btn" data-rot="180">180°</button>
+      <button class="btn" data-rot="270">270°</button>
+      <input type="range" id="rot" min="0" max="360" step="1" value="0">
+      <span class="val" id="rotVal">0°</span>
+    </div>
+    <div class="ctrl-row">
+      <span class="ctrl-label">水平翻转</span>
+      <button class="btn btn-teal" id="flipH">关闭</button>
+      <span style="flex:1"></span>
+      <span class="ctrl-label">垂直翻转</span>
+      <button class="btn btn-teal" id="flipV">关闭</button>
+    </div>
+    <div class="ctrl-row">
+      <span class="ctrl-label">上下平移</span>
+      <input type="range" id="ty" min="-300" max="300" step="1" value="0">
+      <span class="val" id="tyVal">0</span>
+      <span style="font-size:11px;color:#8a847e;margin-left:8px;">(负=上移)</span>
+      <span class="ctrl-label" style="min-width:60px;margin-left:16px;">左右平移</span>
+      <input type="range" id="tx" min="-300" max="300" step="1" value="0">
+      <span class="val" id="txVal">0</span>
+    </div>
+    <div class="ctrl-row">
+      <span class="ctrl-label"></span>
+      <button class="btn-ghost" id="reset" style="margin-left:72px;">重置全部</button>
+    </div>
+  </div>
+
+  <div class="output">
+    <div class="out-label">当前 SVG transform（复制此内容发给天喵）</div>
+    <div class="out-box empty" id="out">无变换（字本身正向）</div>
+    <div class="actions">
+      <button class="btn-primary" id="copy">复制 transform</button>
+      <button class="btn-ghost" id="copyEmpty">复制「无变换」</button>
+    </div>
+  </div>
+</div>
+<div class="toast" id="toast">已复制到剪贴板 ✓</div>
+
+<script>
+// 「你」字 7 笔 path 数据（来自 Make Me a Hanzi graphics.txt）
+const STROKES = [
+  "M 272 567 Q 306 613 342 669 Q 370 718 395 743 Q 405 753 400 769 Q 396 782 365 808 Q 337 827 316 828 Q 297 827 305 802 Q 318 769 306 741 Q 267 647 207 560 Q 150 476 72 385 Q 60 375 58 367 Q 54 355 70 358 Q 82 359 109 384 Q 155 421 213 493 Q 226 509 241 527 L 272 567 Z",
+  "M 241 527 Q 262 506 258 375 Q 258 374 258 370 Q 254 253 221 135 Q 215 114 224 80 Q 236 44 248 32 Q 267 16 279 44 Q 294 86 294 134 Q 303 420 314 485 Q 321 515 295 543 Q 289 549 272 567 C 251 589 227 553 241 527 Z",
+  "M 521 560 Q 561 621 602 708 Q 620 751 638 773 Q 645 786 639 799 Q 633 811 602 830 Q 572 846 554 843 Q 535 839 546 817 Q 561 795 552 757 Q 513 619 407 448 Q 398 436 397 430 Q 394 418 409 423 Q 439 432 503 532 L 521 560 Z",
+  "M 503 532 Q 527 510 555 520 Q 795 608 782 549 Q 783 543 743 468 Q 736 458 741 453 Q 745 447 756 459 Q 852 532 894 549 Q 904 552 905 561 Q 906 574 876 592 Q 852 605 828 621 Q 800 637 783 630 Q 686 590 521 560 C 492 555 479 550 503 532 Z",
+  "M 568 72 Q 531 81 494 91 Q 482 94 483 86 Q 484 79 494 71 Q 569 7 596 -33 Q 611 -49 626 -36 Q 659 -3 661 82 Q 655 149 655 345 Q 656 382 667 407 Q 676 426 659 439 Q 634 461 604 470 Q 585 477 577 469 Q 571 462 582 447 Q 619 384 603 127 Q 597 82 589 74 Q 582 67 568 72 Z",
+  "M 444 320 Q 419 262 385 208 Q 364 180 381 144 Q 388 128 409 139 Q 460 181 468 264 Q 472 295 467 319 Q 463 328 456 328 Q 449 327 444 320 Z",
+  "M 738 307 Q 789 249 847 168 Q 860 146 876 139 Q 885 138 893 146 Q 908 159 900 204 Q 891 264 743 338 Q 734 345 731 332 Q 728 319 738 307 Z"
+]
+
+// 渲染笔画
+const g = document.getElementById('charGroup')
+STROKES.forEach(d => {
+  const p = document.createElementNS('http://www.w3.org/2000/svg', 'path')
+  p.setAttribute('d', d)
+  p.setAttribute('fill', '#ff4d9d')
+  p.setAttribute('stroke', 'none')
+  g.appendChild(p)
+})
+
+// 状态（初始载入主人已调好的方向：rot=180 + 水平翻转）
+let state = { rot: 180, flipH: true, flipV: false, tx: 0, ty: 0 }
+
+function buildTransform() {
+  const parts = []
+  // 额外平移放最前（最后应用 = 屏幕坐标系，往上=负）
+  if (state.tx !== 0 || state.ty !== 0) parts.push('translate(' + state.tx + ' ' + state.ty + ')')
+  const tx = state.flipH ? 1024 : 0
+  const ty = state.flipV ? 1024 : 0
+  const sx = state.flipH ? -1 : 1
+  const sy = state.flipV ? -1 : 1
+  if (tx || ty) parts.push('translate(' + tx + ' ' + ty + ')')
+  if (sx !== 1 || sy !== 1) parts.push('scale(' + sx + ' ' + sy + ')')
+  if (state.rot !== 0) parts.push('rotate(' + state.rot + ' 512 512)')
+  return parts.join(' ')
+}
+
+function render() {
+  const t = buildTransform()
+  g.setAttribute('transform', t)
+  const out = document.getElementById('out')
+  if (t === '') {
+    out.textContent = '无变换（字本身正向）'
+    out.classList.add('empty')
+  } else {
+    out.textContent = t
+    out.classList.remove('empty')
+  }
+  // 按钮高亮
+  document.querySelectorAll('[data-rot]').forEach(b => {
+    b.classList.toggle('active', Number(b.dataset.rot) === state.rot)
+  })
+  document.getElementById('flipH').textContent = state.flipH ? '开启' : '关闭'
+  document.getElementById('flipH').classList.toggle('active', state.flipH)
+  document.getElementById('flipV').textContent = state.flipV ? '开启' : '关闭'
+  document.getElementById('flipV').classList.toggle('active', state.flipV)
+  document.getElementById('rot').value = state.rot
+  document.getElementById('rotVal').textContent = state.rot + '°'
+  document.getElementById('tx').value = state.tx
+  document.getElementById('txVal').textContent = state.tx
+  document.getElementById('ty').value = state.ty
+  document.getElementById('tyVal').textContent = state.ty
+}
+
+// 事件
+document.querySelectorAll('[data-rot]').forEach(b => {
+  b.addEventListener('click', () => { state.rot = Number(b.dataset.rot); render() })
+})
+document.getElementById('rot').addEventListener('input', e => {
+  state.rot = Number(e.target.value); render()
+})
+document.getElementById('flipH').addEventListener('click', () => { state.flipH = !state.flipH; render() })
+document.getElementById('flipV').addEventListener('click', () => { state.flipV = !state.flipV; render() })
+document.getElementById('tx').addEventListener('input', e => { state.tx = Number(e.target.value); render() })
+document.getElementById('ty').addEventListener('input', e => { state.ty = Number(e.target.value); render() })
+document.getElementById('reset').addEventListener('click', () => {
+  state = { rot: 0, flipH: false, flipV: false, tx: 0, ty: 0 }; render()
+})
+
+function showToast(msg) {
+  const t = document.getElementById('toast')
+  t.textContent = msg
+  t.classList.add('show')
+  setTimeout(() => t.classList.remove('show'), 1600)
+}
+
+document.getElementById('copy').addEventListener('click', () => {
+  const t = buildTransform()
+  const text = t === '' ? '' : t
+  navigator.clipboard.writeText(text).then(() => {
+    showToast(text === '' ? '已复制「无变换」（空）✓' : '已复制 transform ✓')
+  }).catch(() => {
+    // 降级
+    const ta = document.createElement('textarea')
+    ta.value = text; document.body.appendChild(ta); ta.select()
+    document.execCommand('copy'); document.body.removeChild(ta)
+    showToast('已复制 ✓')
+  })
+})
+document.getElementById('copyEmpty').addEventListener('click', () => {
+  navigator.clipboard.writeText('').then(() => showToast('已复制空字符串 ✓'))
+})
+
+render()
+</script>
+</body>
+</html>
