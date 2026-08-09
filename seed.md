@@ -71,3 +71,6 @@
 ## 数据资源
 - 汉字图形数据 — public/hanzi-data/graphics.txt —（Make Me a Hanzi，9574 字 SVG 路径）
 - 汉字字典数据 — public/hanzi-data/dictionary.txt —（部首、笔画数）
+
+## 流程文档
+- 发版流程技能 — SKILL.md —

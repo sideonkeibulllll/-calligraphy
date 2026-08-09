@@ -26,15 +26,8 @@ function mapItem(row: DbRow): PlaylistItem {
 }
 
 function splitChars(text: string): string[] {
-  const seen = new Set<string>()
-  const result: string[] = []
-  for (const ch of Array.from(text)) {
-    if (ch.trim() && !seen.has(ch)) {
-      seen.add(ch)
-      result.push(ch)
-    }
-  }
-  return result
+  // 保留输入顺序与重复字（如"一生一世"拆为 4 字），仅过滤空白
+  return Array.from(text).filter((ch) => ch.trim())
 }
 
 export const playlistRepository = {
@@ -78,13 +71,10 @@ export const playlistRepository = {
   },
 
   async addCharsByString(playlistId: number, text: string): Promise<number> {
+    // 不去重：重复字也逐个加入歌单（各有独立 position）
     const chars = splitChars(text)
     for (const ch of chars) {
-      const exist = await query(
-        'SELECT id FROM playlist_items WHERE playlist_id = ? AND character = ?',
-        [playlistId, ch]
-      )
-      if (!exist.length) await this.addItem(playlistId, ch)
+      await this.addItem(playlistId, ch)
     }
     return chars.length
   },

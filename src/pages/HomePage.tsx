@@ -14,15 +14,8 @@ import { cardRepository } from '../db/repositories/card-repository'
 import { recordRepository } from '../db/repositories/record-repository'
 
 function splitChars(text: string): string[] {
-  const seen = new Set<string>()
-  const result: string[] = []
-  for (const ch of Array.from(text)) {
-    if (ch.trim() && !seen.has(ch)) {
-      seen.add(ch)
-      result.push(ch)
-    }
-  }
-  return result
+  // 保留输入顺序与重复字（如"一生一世"拆为 4 字），仅过滤空白
+  return Array.from(text).filter((ch) => ch.trim())
 }
 
 function greeting(): string {
