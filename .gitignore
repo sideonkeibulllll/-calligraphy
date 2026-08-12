@@ -8,3 +8,6 @@ vite.config.d.ts
 android
 release
 .workbuddy
+
+# 私有提示词（不入库）
+项目记忆.md
