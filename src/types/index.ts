@@ -59,3 +59,33 @@ export interface Sm2Result {
 }
 
 export type GridType = 'mi' | 'tian' | 'gong'
+
+export interface SketchFolder {
+  id: number
+  name: string
+  created_at: string
+}
+
+export interface SketchImage {
+  id: number
+  name: string
+  folder_id: number | null
+  created_at: string
+  updated_at: string
+}
+
+export interface SketchSession {
+  id: number
+  image_id: number
+  started_at: string
+  duration: number
+}
+
+export interface SketchImageWithThumb extends SketchImage {
+  thumbUrl: string
+}
+
+export interface SketchSessionWithImage {
+  image: SketchImageWithThumb
+  session: SketchSession
+}

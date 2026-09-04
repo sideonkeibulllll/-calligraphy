@@ -1,6 +1,6 @@
 /**
  * 中文名：笔顺区
- * 职责：Make Me a Hanzi 字符数据自渲染 SVG，逐笔演示 + 手动控制
+ * 职责：Make Me a Hanzi 字符数据自渲染 SVG，逐笔演示（自动无限循环）+ 手动控制
  * 依赖：汉字数据钩子
  */
 import { useState, useEffect, useRef } from 'react'
@@ -44,8 +44,8 @@ export default function StrokeOrder({ char, size = 150 }: StrokeOrderProps) {
     timerRef.current = setInterval(() => {
       setVisible((c) => {
         if (c >= data.strokes.length) {
-          stopTimer()
-          return c
+          // 播完保持完整字一个周期后回到第一笔，无限循环
+          return 0
         }
         return c + 1
       })

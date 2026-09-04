@@ -1,6 +1,6 @@
 /**
  * 中文名：练习主页
- * 职责：问候+归色进度、开始复习入口、输入临摹入口、快捷入口
+ * 职责：问候+归色进度、开始复习入口、输入临摹入口、快捷入口（歌单/历史/画摹）
  * 依赖：胶囊按钮、字符输入框、归色进度环、临摹状态、字卡仓库、练习记录仓库
  */
 import { useState, useEffect } from 'react'
@@ -100,6 +100,17 @@ export default function HomePage() {
         >
           <div style={{ fontSize: 14, fontWeight: 700 }}>历史</div>
           <div style={{ fontSize: 11, color: 'var(--text-tertiary)', marginTop: 4 }}>练习记录与星标</div>
+        </button>
+        <button
+          onClick={() => navigate('/sketch')}
+          style={{
+            flex: 1, padding: 16, borderRadius: 'var(--radius-card)',
+            background: 'var(--bg-surface)', border: '1px solid var(--border-pink)',
+            color: 'var(--text-primary)', textAlign: 'left'
+          }}
+        >
+          <div style={{ fontSize: 14, fontWeight: 700 }}>画摹</div>
+          <div style={{ fontSize: 11, color: 'var(--text-tertiary)', marginTop: 4 }}>画作临摹练习</div>
         </button>
       </div>
     </div>
