@@ -29,6 +29,8 @@
 - 字卡仓库 — src/db/repositories/card-repository.ts — 数据库连接、类型定义、日期工具
 - 练习记录仓库 — src/db/repositories/record-repository.ts — 数据库连接、类型定义、日期工具
 - 歌单仓库 — src/db/repositories/playlist-repository.ts — 数据库连接、类型定义、日期工具
+- 画摹图库 — src/db/sketch-db.ts —
+- 画摹仓库 — src/db/repositories/sketch-repository.ts — 画摹图库、类型定义、日期工具
 
 ## 算法与工具
 - 间隔重复算法 — src/utils/sm2.ts — 类型定义、日期工具
@@ -43,6 +45,7 @@
 - 今日复习钩子 — src/hooks/use-today-review.ts — 字卡仓库、复习状态
 - 汉字数据钩子 — src/hooks/use-character-data.ts —
 - 随机名言钩子 — src/hooks/use-random-quote.ts — 名言库
+- 屏幕常亮钩子 — src/hooks/use-wake-lock.ts —
 
 ## 通用组件
 - 胶囊按钮 — src/components/CapsuleButton.tsx —
@@ -56,6 +59,14 @@
 - 底部导航栏 — src/components/TabBar.tsx —
 - 描红层 — src/components/TracingLayer.tsx —
 - 笔顺区 — src/components/StrokeOrder.tsx — 汉字数据钩子
+- 画摹选图器 — src/components/SketchImagePicker.tsx —
+- 画摹历史卡片 — src/components/SketchHistoryCard.tsx —
+- 画摹图片卡片 — src/components/SketchImageCard.tsx —
+- 画摹文件夹卡片 — src/components/SketchFolderCard.tsx —
+- 画摹长按菜单 — src/components/SketchCardMenu.tsx —
+- 画摹移动选择器 — src/components/SketchMoveSheet.tsx — 画摹文件夹卡片所用的类型定义
+- 画摹手势查看器 — src/components/SketchGestureViewer.tsx —
+- 画摹锁定层 — src/components/SketchLockOverlay.tsx —
 
 ## 页面
 - 应用入口 — src/main.tsx — 路由容器、应用根组件
@@ -67,6 +78,9 @@
 - 歌单管理页 — src/pages/PlaylistPage.tsx — 胶囊按钮、歌单仓库
 - 歌单详情页 — src/pages/PlaylistDetailPage.tsx — 胶囊按钮、字符输入框、歌单仓库
 - 设置页 — src/pages/SettingsPage.tsx — 设置状态
+- 画摹主页 — src/pages/SketchHubPage.tsx — 画摹选图器、画摹历史卡片、胶囊按钮、画摹仓库
+- 画摹图片管理器 — src/pages/SketchGalleryPage.tsx — 画摹图片卡片、画摹文件夹卡片、画摹长按菜单、画摹移动选择器、胶囊按钮、画摹仓库
+- 画摹画布页 — src/pages/SketchCanvasPage.tsx — 画摹手势查看器、画摹锁定层、屏幕常亮钩子、画摹仓库、@capacitor/app
 
 ## 数据资源
 - 汉字图形数据 — public/hanzi-data/graphics.txt —（Make Me a Hanzi，9574 字 SVG 路径）
