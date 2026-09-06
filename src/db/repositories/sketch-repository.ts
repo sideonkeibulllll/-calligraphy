@@ -70,7 +70,9 @@ export const sketchRepository = {
 
   async createFolder(name: string): Promise<SketchFolder> {
     const folder: SketchFolder = { id: 0, name, created_at: nowIso() }
-    const key = await reqOnce<IDBValidKey>(STORE_FOLDERS, 'readwrite', (s) => s.add(folder))
+    // 剥离 id:0，交给 autoIncrement 生成主键（显式 0 会顶死自增键，导致后续 add 全部 ConstraintError）
+    const { id: _id, ...toAdd } = folder
+    const key = await reqOnce<IDBValidKey>(STORE_FOLDERS, 'readwrite', (s) => s.add(toAdd))
     folder.id = key as number
     return folder
   },
@@ -123,7 +125,9 @@ export const sketchRepository = {
       blob: file,
       thumb
     }
-    const key = await reqOnce<IDBValidKey>(STORE_IMAGES, 'readwrite', (s) => s.add(rec))
+    // 剥离 id:0，交给 autoIncrement 生成主键（显式 0 会顶死自增键，导致后续 add 全部 ConstraintError）
+    const { id: _id, ...toAdd } = rec
+    const key = await reqOnce<IDBValidKey>(STORE_IMAGES, 'readwrite', (s) => s.add(toAdd))
     const { blob: _blob, thumb: _thumb, ...meta } = { ...rec, id: key as number }
     return meta
   },
@@ -202,7 +206,9 @@ export const sketchRepository = {
       duration: Math.max(0, Math.round(durationSec))
     }
     await runTx([STORE_SESSIONS, STORE_IMAGES], 'readwrite', (tx) => {
-      tx.objectStore(STORE_SESSIONS).add(session)
+      // 剥离 id:0，交给 autoIncrement 生成主键（显式 0 会顶死自增键，导致后续 add 全部 ConstraintError）
+      const { id: _sesId, ...sesToAdd } = session
+      tx.objectStore(STORE_SESSIONS).add(sesToAdd)
       const store = tx.objectStore(STORE_IMAGES)
       const req = store.get(imageId)
       req.onsuccess = () => {
